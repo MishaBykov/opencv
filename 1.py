@@ -1,23 +1,16 @@
 import cv2
-import numpy as np
-from matplotlib import pyplot as plt
 
+source = cv2.imread("1.bmp")
 
-def show_image(img):
-    cv2.imshow('Image', img)
-    cv2.waitKey(0)
+template = cv2.imread("opponent.bmp")
+w, h = template.shape[:-1]
+result = cv2.matchTemplate(source, template, cv2.TM_CCOEFF_NORMED)
+cv2.normalize(result, result, 1, 0, cv2.NORM_MINMAX)
 
+min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+top_left = max_loc
+bottom_right = (top_left[0] + h, top_left[1] + w)
 
-image = cv2.imread("test.png")
-image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-ret, image = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY_INV)  # Бинаризация
-im2, contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)  # Поиск контуров
-image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-cv2.drawContours(image, contours, -1, (0, 100, 0), 2)
-show_image(image)
-for contour in contours:
-    x, y, w, h = cv2.boundingRect(contour)  # Поиск ограничивающего прямоугольника
-    # if w < 50:
-    #     continue  # Маленькие контуры меньше 50 пикселей не нужны
-    cv2.rectangle(image, (x, y), (x + w, y + h), (100, 0, 0), 2)
-show_image(image)
+cv2.rectangle(source, top_left, bottom_right, 255, 2)
+cv2.imshow('Result', source)
+cv2.waitKey(0)

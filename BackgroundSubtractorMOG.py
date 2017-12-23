@@ -4,6 +4,7 @@ cap = cv2.VideoCapture('03.wmv')
 fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
 while True:
     ret, frame = cap.read()
+    cv2.imwrite('1.bmp', frame)
     fgmask = fgbg.apply(frame)
     cv2.medianBlur(fgmask, 5, fgmask)
     if fgmask is None:
