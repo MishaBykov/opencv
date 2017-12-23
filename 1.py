@@ -1,23 +1,23 @@
 import cv2
+import numpy as np
+from matplotlib import pyplot as plt
 
-cascadePath = r"c:\OpenCV2.2\data\haarcascades\haarcascade_frontalface_default.xml"
-cascade = cv2.Load(cascadePath)
-memstorage = cv.CreateMemStorage()
-capture = cv.CaptureFromCAM(0)
-outimage = None
-name = 'window'
-cv.NamedWindow(name)
-while True:
-    frame = cv.QueryFrame(capture)
-    key = cv.WaitKey(10)
-    if key != -1:
-        break
-    if not frame:
-        break
-    if outimage is None or cv.GetSize(frame) != cv.GetSize(outimage):
-        outimage = cv.CreateImage(cv.GetSize(frame), 8, 3)
-    cv.Flip(frame, outimage, 1)
-    faces = cv.HaarDetectObjects(outimage, cascade, memstorage)
-    for rect, n in faces:
-        cv.Rectangle(outimage, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), (255, 0, 0) )
-    cv.ShowImage(name, outimage)
+
+def show_image(img):
+    cv2.imshow('Image', img)
+    cv2.waitKey(0)
+
+
+image = cv2.imread("test.png")
+image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+ret, image = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY_INV)  # Бинаризация
+im2, contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)  # Поиск контуров
+image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+cv2.drawContours(image, contours, -1, (0, 100, 0), 2)
+show_image(image)
+for contour in contours:
+    x, y, w, h = cv2.boundingRect(contour)  # Поиск ограничивающего прямоугольника
+    # if w < 50:
+    #     continue  # Маленькие контуры меньше 50 пикселей не нужны
+    cv2.rectangle(image, (x, y), (x + w, y + h), (100, 0, 0), 2)
+show_image(image)
