@@ -24,7 +24,7 @@ while 1:
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)  # Поиск ограничивающего прямоугольника
         if w < 50:
-            continue  # Маленькие контуры меньше 50 пикселей не нужны
+            continue
         cv2.rectangle(frame, (x, y), (x + w, y + h), (100, 0, 0), 2)
         point_robot = (x + int(w / 2), y + int(h / 2))
         cv2.circle(frame, point_robot, 3, (0, 0, 255), -1)
