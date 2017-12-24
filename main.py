@@ -1,11 +1,18 @@
-import numpy as np
+import math
 import cv2
 
+color_red = (0, 0, 255)
+color_green = (0, 255, 0)
+color_yellow = (0, 255, 255)
+color_purple = (255, 0, 255)
 cap = cv2.VideoCapture("03.wmv")
 template = cv2.imread("opponent.bmp")
 fgbg = cv2.createBackgroundSubtractorMOG2()
 while 1:
     ret, frame = cap.read()
+    if frame is None:
+        break
+    height, width = frame.shape[:-1]
     fgmask = fgbg.apply(frame)
     if fgmask is None:
         break
@@ -13,13 +20,14 @@ while 1:
 
     im2, contours, hierarchy = cv2.findContours(fgmask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)  # Поиск контуров
     cv2.cvtColor(fgmask, cv2.COLOR_GRAY2BGR)
-    cv2.drawContours(fgmask, contours, -1, (0, 100, 0), 2)
+    point_robot = 0
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)  # Поиск ограничивающего прямоугольника
         if w < 50:
             continue  # Маленькие контуры меньше 50 пикселей не нужны
         cv2.rectangle(frame, (x, y), (x + w, y + h), (100, 0, 0), 2)
-
+        point_robot = (x + int(w / 2), y + int(h / 2))
+        cv2.circle(frame, point_robot, 3, (0, 0, 255), -1)
     w, h = template.shape[:-1]
     result = cv2.matchTemplate(frame, template, cv2.TM_CCOEFF_NORMED)
     cv2.normalize(result, result, 1, 0, cv2.NORM_MINMAX)
@@ -27,10 +35,15 @@ while 1:
     top_left = max_loc
     bottom_right = (top_left[0] + h, top_left[1] + w)
     cv2.rectangle(frame, top_left, bottom_right, 255, 2)
-
-    cv2.imshow('MOG2', fgmask)
+    point_opponent = (top_left[0] + int(h / 2), top_left[1] + int(w / 2))
+    cv2.circle(frame, point_opponent, 3, (0, 0, 255), -1)
+    if point_robot != 0:
+        cv2.line(frame, point_robot, point_opponent, color_green, 2)
+        distance = math.sqrt(math.pow(point_robot[0] - point_opponent[0], 2)
+                             + math.pow(point_robot[1] - point_opponent[1], 2))
+        cv2.putText(frame, str(round(distance, 3)), (0, height - 5), cv2.FONT_HERSHEY_PLAIN, 2, color_yellow, 1)
     cv2.imshow('frame', frame)
-    k = cv2.waitKey(10) & 0xff
+    k = cv2.waitKey(1) & 0xff
     if k == 27:
         break
 cap.release()
