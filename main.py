@@ -56,32 +56,3 @@ while True:
     i += 1
 cap.release()
 cv2.destroyAllWindows()
-
-# CvMemStorage * storage = cvCreateMemStorage(0);
-#
-# CvSeq * contours = 0;
-# cvFindContours(gray, storage, & contours, sizeof(CvContour),
-# CV_RETR_TREE, CV_CHAIN_APPROX_NONE, cvPoint(0, 0) ); // Поиск
-# контуров
-#
-# for (CvSeq * c=contours; c != NULL; c=c->h_next)
-# {
-#     CvRect
-# Rect = cvBoundingRect(c); // Поиск
-# ограничивающего
-# прямоугольника
-# if (Rect.width < 50)
-# continue; // Маленькие
-# контуры
-# меньше
-# 50
-# пикселей
-# не
-# нужны
-#
-# cvRectangle(image, cvPoint(Rect.x, Rect.y), cvPoint(Rect.x + Rect.width, Rect.y + Rect.height), CV_RGB(255, 0, 0), 2);
-# }
-#
-# cvReleaseMemStorage( & storage);
-#
-# cvSaveImage("image24.png", image);
